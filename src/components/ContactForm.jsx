@@ -9,9 +9,11 @@ const ContactForm = () => {
   const form = useRef();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const sendEmail = (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     // Extract values from form
     const formData = {
@@ -22,7 +24,7 @@ const ContactForm = () => {
     };
 
     emailjs
-      .send("service_socaqes", "template_nm7hqua", formData, 'kvDUsF_y4LXP9X-jm')
+      .send(import.meta.env.VITE_EMAILJS_SERVICE_ID, import.meta.env.VITE_EMAILJS_TEMPLATE_ID, formData, import.meta.env.VITE_EMAILJS_PUBLIC_KEY)
       .then(
         () => {
           setIsSubmitted(true);
@@ -32,15 +34,18 @@ const ContactForm = () => {
         () => {
           setIsError(true);
         }
-      );
+      )
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
-    <div id="contact" className="w-full flex flex-col md:flex-row items-center mx-auto my-10 gap-8 p-6 md:p-10">
+    <div id="contact" className=" w-full flex flex-col md:flex-row items-center mx-auto my-10 gap-8 p-6 md:p-10">
       
       <motion.div
-        whileInView={{ opacity: 1, x: 100 }}
-        initial={{ opacity: 1, x: 0 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0, x: -100 }}
         transition={{ ease: easeIn, duration: 1 }}
         className="flex md:flex-col items-center gap-4 md:gap-8 sm:w-3/4  mx-auto md:w-1/4"
       >
@@ -112,7 +117,8 @@ const ContactForm = () => {
           <input
             className="border-2 md:border-4 border-black font-bold py-2 px-4 rounded transition-all cursor-pointer"
             type="submit"
-            value="Send"
+            value={isLoading ? "Sending..." : "Send"}
+            disabled={isLoading}
           />
         </form>
       </motion.div>
